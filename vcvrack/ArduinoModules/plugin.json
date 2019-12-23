@@ -14,8 +14,8 @@
   "changelogUrl": "",
   "modules": [
     {
-      "slug": "ArduinoTest",
-      "name": "Arduino Test",
+      "slug": "ArduinoMIDI",
+      "name": "Arduino MIDI",
       "description": "Basic Arduino communication using MIDI",
       "tags": [
         "Controller",
