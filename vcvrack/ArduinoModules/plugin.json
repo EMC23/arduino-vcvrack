@@ -12,5 +12,16 @@
   "sourceUrl": "https://github.com/hisschemoller/arduino-vcvrack",
   "donateUrl": "",
   "changelogUrl": "",
-  "modules": []
+  "modules": [
+    {
+      "slug": "ArduinoTest",
+      "name": "Arduino Test",
+      "description": "Basic Arduino communication using MIDI",
+      "tags": [
+        "Controller",
+        "MIDI",
+        "Utility"
+      ]
+    }
+  ]
 }
