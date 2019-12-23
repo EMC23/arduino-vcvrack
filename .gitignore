@@ -1,0 +1,6 @@
+/vcvrack/ArduinoModules/build
+/vcvrack/ArduinoModules/dist
+/vcvrack/ArduinoModules/plugin.so
+/vcvrack/ArduinoModules/plugin.dylib
+/vcvrack/ArduinoModules/plugin.dll
+.DS_Store

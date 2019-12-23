@@ -1,0 +1,16 @@
+{
+  "slug": "ArduinoModules",
+  "name": "Arduino Modules",
+  "version": "1.0.0",
+  "license": "mit",
+  "brand": "Arduino Modules",
+  "author": "Wouter Hisschemoller",
+  "authorEmail": "email@hisschemoller.com",
+  "authorUrl": "https://www.hisschemoller.com",
+  "pluginUrl": "http://emc23.com/",
+  "manualUrl": "https://github.com/hisschemoller/arduino-vcvrack",
+  "sourceUrl": "https://github.com/hisschemoller/arduino-vcvrack",
+  "donateUrl": "",
+  "changelogUrl": "",
+  "modules": []
+}
