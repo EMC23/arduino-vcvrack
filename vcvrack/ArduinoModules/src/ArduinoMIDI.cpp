@@ -1,6 +1,7 @@
 #include "plugin.hpp"
 
 struct MidiOutput : dsp::MidiGenerator<PORT_MAX_CHANNELS>, midi::Output {
+
 	void onMessage(midi::Message message) override {
 		midi::Output::sendMessage(message);
 	}
@@ -13,14 +14,64 @@ struct MidiOutput : dsp::MidiGenerator<PORT_MAX_CHANNELS>, midi::Output {
 
 struct ArduinoMIDI : Module {
 
+	enum LightIds {
+		NOTE_IN_LIGHT,
+		NUM_LIGHTS
+	};
+
   midi::InputQueue midiInput;
   MidiOutput midiOutput;
 
   ArduinoMIDI() {
-    config(0, 0, 0, 0);
+    config(0, 0, 0, NUM_LIGHTS);
+		onReset();
   }
 
-  void process(const ProcessArgs& args) override {}
+	void onReset() override {
+		midiInput.reset();
+		midiOutput.reset();
+	}
+
+  void process(const ProcessArgs& args) override {
+		midi::Message msg;
+		while (midiInput.shift(&msg)) {
+			processMessage(msg);
+		}
+	}
+
+	void processMessage(midi::Message msg) {
+		switch (msg.getStatus()) {
+			// note off
+			case 0x8: {
+				releaseNote(msg.getNote());
+			} break;
+			// note on
+			case 0x9: {
+				if (msg.getValue() > 0) {
+					pressNote(msg.getNote(), msg.getValue());
+				}
+				else {
+					// Many stupid keyboards send a "note on" command with 0 velocity to mean "note release"
+					releaseNote(msg.getNote());
+				}
+			} break;
+			default: break;
+		}
+	}
+
+	void pressNote(uint8_t note, uint8_t vel) {
+		lights[NOTE_IN_LIGHT].setBrightness(1.f);
+
+		midiOutput.setVelocity(0, 1);
+		midiOutput.setNoteGate(60, false, 1);
+	}
+
+	void releaseNote(uint8_t note) {
+		lights[NOTE_IN_LIGHT].setBrightness(0.f);
+
+		midiOutput.setVelocity(100, 1);
+		midiOutput.setNoteGate(60, true, 1);
+	}
 };
 
 struct ArduinoMIDIWidget : ModuleWidget {
@@ -42,6 +93,8 @@ struct ArduinoMIDIWidget : ModuleWidget {
 		midiOutputWidget->box.size = mm2px(Vec(33.840, 28));
 		midiOutputWidget->setMidiPort(module ? &module->midiOutput : NULL);
 		addChild(midiOutputWidget);
+
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(10, 80)), module, ArduinoMIDI::NOTE_IN_LIGHT));
   }
 };
 

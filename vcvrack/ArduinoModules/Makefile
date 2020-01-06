@@ -8,7 +8,7 @@ CXXFLAGS +=
 
 # Careful about linking to shared libraries, since you can't assume much about the user's environment and library search path.
 # Static libraries are fine, but they should be added to this plugin's build system.
-LDFLAGS += '/usr/local/Cellar/libusb/1.0.23/lib/libusb-1.0.a'
+# LDFLAGS += '/usr/local/Cellar/libusb/1.0.23/lib/libusb-1.0.a'
 # LDFLAGS+=$(shell $(PKGCONFIG) --variable=libdir libusb-1.0)/libusb-1.0.a
 
 
