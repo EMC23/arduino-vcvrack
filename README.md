@@ -41,6 +41,11 @@ On Mac libusb will be installed at:
 /usr/local/Cellar/libusb/<version nr, example: 1.0.21>/lib/libusb-1.0.a
 ```
 
+### Connect a rotary encoder
+
+- https://www.electroschematics.com/rotary-encoder-arduino/
+- https://how2electronics.com/how-to-use-rotary-encoder-with-arduino/
+
 ### Arduino Leonardo Mac OS Mojave
 
 Arduino Leonardo USB port doesn't appear.<br>
