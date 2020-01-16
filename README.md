@@ -22,6 +22,13 @@ The first prototype is an Arduino Leonardo that communicates with a VCV Rack mod
 
 The Arduino does nothing more than to send knob and button changes to the VCV Rack module in the form of MIDI Continuous Control data, and to switch the LEDs on or off based on MIDI CC data it receives from the module.
 
+![Prototype 1](assets/img/prototype1_side_2020-01-16_1200.jpg 'Prototype 1')
+
+![Prototype 1](assets/img/prototype1_overview_2020-01-16_1200.jpg 'Prototype 1')
+
+![Prototype 1](assets/img/prototype1_top_2020-01-16_1200.jpg 'Prototype 1')
+
+
 
 
 ## Notes
@@ -57,3 +64,9 @@ sudo rm -rf /System/Library/Extensions/usb.kext
 ```
 
 Then reboot.
+
+<style>
+img {
+  max-width: 480px;
+}
+</style>
