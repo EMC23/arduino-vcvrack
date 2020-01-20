@@ -22,11 +22,47 @@ The first prototype is an Arduino Leonardo that communicates with a VCV Rack mod
 
 The Arduino does nothing more than to send knob and button changes to the VCV Rack module in the form of MIDI Continuous Control data, and to switch the LEDs on or off based on MIDI CC data it receives from the module.
 
-![Prototype 1](assets/img/prototype1_side_2020-01-16_1200.jpg 'Prototype 1')
+### MIDI implementation chart
 
-![Prototype 1](assets/img/prototype1_overview_2020-01-16_1200.jpg 'Prototype 1')
+All MIDI communication uses Continuous Controllers 14 and 15 because they are 'officially' undefined in the MIDI specification.
 
-![Prototype 1](assets/img/prototype1_top_2020-01-16_1200.jpg 'Prototype 1')
+| CC 14 |   |
+| --- | --- |
+| 8 | Pushbutton off |
+| 9 | Pushbutton on |
+| 10 | Encoder button off |
+| 11 | Encoder button on |
+| 12 | Encoder -1 |
+| 13 | Encoder +1 |
+| &nbsp; | &nbsp; |
+| 16 | LED 0 off |
+| 17 | LED 0 on |
+| 18 | LED 1 off |
+| 19 | LED 1 on |
+| 20 | LED 2 off |
+| 21 | LED 2 on |
+| 22 | LED 3 off |
+| 23 | LED 3 on |
+| 24 | LED 4 off |
+| 25 | LED 4 on |
+| 26 | LED 5 off |
+| 27 | LED 5 on |
+| 28 | LED 6 off |
+| 29 | LED 6 on |
+| 30 | LED 7 off |
+| 31 | LED 7 on |
+
+| CC 15 |   |
+| --- | --- |
+| 0 - 127 | Potentiometer value |
+
+### First prototype images
+
+<img src="assets/img/prototype1_side_2020-01-16_1200.jpg" alt="Prototype 1" style="max-width:480px;">
+
+<img src="assets/img/prototype1_overview_2020-01-16_1200.jpg" alt="Prototype 1" style="max-width:480px;">
+
+<img src="assets/img/prototype1_top_2020-01-16_1200.jpg" alt="Prototype 1" style="max-width:480px;">
 
 
 
