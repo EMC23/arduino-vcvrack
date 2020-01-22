@@ -5,7 +5,7 @@ const uint8_t MIDI_CHANNEL = 0;
 const uint8_t MIDI_CC_BINARY = 14;
 const uint8_t MIDI_CC_POTMETER = 15;
 const uint8_t MIDI_CC_TYPE = 0xb0;
-const uint8_t MIDI_MSG_HEADER = 0x0b
+const uint8_t MIDI_MSG_HEADER = 0x0b;
 const uint8_t NUM_LEDS = 8;
 const uint8_t PIN_PUSH_BTN = 8;
 const uint8_t PIN_ENCODER_BTN = 9;
@@ -55,7 +55,7 @@ void loop() {
       Serial.println(rx.byte3, HEX);
 
 			// type = rx.byte1 & 0xf0, channel = rx.byte1 & 0xf) + 1
-      if (rx.byte1 & 0xf0 == MIDI_CC_TYPE && rx.byte1 & 0xf) == MIDI_CHANNEL && rx.byte2 == MIDI_CC_BINARY) {
+      if ((rx.byte1 & 0xf0) == MIDI_CC_TYPE && (rx.byte1 & 0xf) == MIDI_CHANNEL && rx.byte2 == MIDI_CC_BINARY) {
         if (rx.byte3 >= 16 && rx.byte3 < 31) {
           int ledIndex = (int)(rx.byte3 - 16) / 2;
           digitalWrite(ledIndex, rx.byte3 % 2 == 1);
