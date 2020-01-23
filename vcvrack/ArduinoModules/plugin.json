@@ -8,8 +8,8 @@
   "authorEmail": "email@hisschemoller.com",
   "authorUrl": "https://www.hisschemoller.com",
   "pluginUrl": "http://emc23.com/",
-  "manualUrl": "https://github.com/hisschemoller/arduino-vcvrack",
-  "sourceUrl": "https://github.com/hisschemoller/arduino-vcvrack",
+  "manualUrl": "https://github.com/emc23/arduino-vcvrack",
+  "sourceUrl": "https://github.com/emc23/arduino-vcvrack",
   "donateUrl": "",
   "changelogUrl": "",
   "modules": [
@@ -17,6 +17,16 @@
       "slug": "ArduinoMIDI",
       "name": "Arduino MIDI",
       "description": "Basic Arduino communication using MIDI",
+      "tags": [
+        "Controller",
+        "MIDI",
+        "Utility"
+      ]
+    },
+    {
+      "slug": "Prototype1Test",
+      "name": "Prototype 1 Test",
+      "description": "Test Prototype communication using MIDI",
       "tags": [
         "Controller",
         "MIDI",
