@@ -1,5 +1,8 @@
 #include "plugin.hpp"
 
+#define MIDI_CC_BINARY 14
+#define MIDI_CC_POTMETER 15
+
 /**
  * 
  */
@@ -18,8 +21,36 @@ struct MidiOutput : dsp::MidiGenerator<PORT_MAX_CHANNELS>, midi::Output {
 /**
  * 
  */
+// struct inputToCC {
+// 	int controllerOn,
+//  int controllerOff,
+// 	int inputId,
+// 	int lightId,
+// 	dsp::SchmittTrigger trigger,
+// }
+
+/**
+ * 
+ */
 struct Prototype1Test : Module {
 
+	enum ParamIds {
+		NUM_PARAMS
+	};
+	enum InputIds {
+		INPUT_0,
+		INPUT_1,
+		INPUT_2,
+		INPUT_3,
+		INPUT_4,
+		INPUT_5,
+		INPUT_6,
+		INPUT_7,
+		NUM_INPUTS
+	};
+	enum OutputIds {
+		NUM_OUTPUTS
+	};
 	enum LightIds {
 		LED_0,
 		LED_1,
@@ -32,11 +63,14 @@ struct Prototype1Test : Module {
 		NUM_LIGHTS
 	};
 
+	// struct of input id, led id and MIDI CCs for high and low 
   midi::InputQueue midiInput;
   MidiOutput midiOutput;
+	dsp::SchmittTrigger input0OnTrigger;
+	dsp::SchmittTrigger input0OffTrigger;
 
   Prototype1Test() {
-    config(0, 0, 0, NUM_LIGHTS);
+    config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		onReset();
   }
 
@@ -49,6 +83,23 @@ struct Prototype1Test : Module {
 		midi::Message msg;
 		while (midiInput.shift(&msg)) {
 			processMessage(msg);
+		}
+
+		if (inputs[INPUT_0].isConnected()) {
+
+			// if the input value of 1 triggers the schmittrigger to flip HIGH
+			if (input0OnTrigger.process(inputs[INPUT_0].value)) {
+				lights[LED_0].setBrightness(1.f);
+				int value = 17;
+				midiOutput.setCc(value, MIDI_CC_BINARY);
+			}
+
+			// if the input value of 0 triggers the schmittrigger to flip HIGH
+			if (input0OffTrigger.process(1 - inputs[INPUT_0].value)) {
+				lights[LED_0].setBrightness(0);
+				int value = 16;
+				midiOutput.setCc(value, MIDI_CC_BINARY);
+			}
 		}
 	}
 
@@ -140,6 +191,15 @@ struct Prototype1TestWidget : ModuleWidget {
 		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(center - 3, 86)), module, Prototype1Test::LED_5));
 		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(center + 3, 86)), module, Prototype1Test::LED_6));
 		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(center + 9, 86)), module, Prototype1Test::LED_7));
+
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(center - 13.5, 95)), module, Prototype1Test::INPUT_0));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(center - 4.5, 95)), module, Prototype1Test::INPUT_1));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(center + 4.5, 95)), module, Prototype1Test::INPUT_2));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(center + 13.5, 95)), module, Prototype1Test::INPUT_3));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(center - 13.5, 105)), module, Prototype1Test::INPUT_4));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(center - 4.5, 105)), module, Prototype1Test::INPUT_5));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(center + 4.5, 105)), module, Prototype1Test::INPUT_6));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(center + 13.5, 105)), module, Prototype1Test::INPUT_7));
   }
 };
 
