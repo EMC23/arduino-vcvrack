@@ -19,15 +19,16 @@ struct MidiOutput : dsp::MidiGenerator<PORT_MAX_CHANNELS>, midi::Output {
 };
 
 /**
- * 
+ * Data needed have an input trigger a light and send MIDI CCs.
  */
-// struct inputToCC {
-// 	int controllerOn,
-//  int controllerOff,
-// 	int inputId,
-// 	int lightId,
-// 	dsp::SchmittTrigger trigger,
-// }
+struct input {
+	int controllerOff;
+	int controllerOn;
+	int inputId;
+	int lightId;
+	dsp::SchmittTrigger triggerOff;
+	dsp::SchmittTrigger triggerOn;
+};
 
 /**
  * 
@@ -63,15 +64,22 @@ struct Prototype1Test : Module {
 		NUM_LIGHTS
 	};
 
-	// struct of input id, led id and MIDI CCs for high and low 
   midi::InputQueue midiInput;
   MidiOutput midiOutput;
-	dsp::SchmittTrigger input0OnTrigger;
-	dsp::SchmittTrigger input0OffTrigger;
+	struct input ins[NUM_INPUTS];
 
   Prototype1Test() {
     config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		onReset();
+
+		for (int i = 0; i < NUM_INPUTS; i++) {
+			struct input in;
+			in.controllerOff = 16 + (i * 2);
+			in.controllerOn = 17 + (i * 2);
+			in.inputId = i;
+			in.lightId = i;
+			ins[i] = in;
+		}
   }
 
 	void onReset() override {
@@ -85,20 +93,21 @@ struct Prototype1Test : Module {
 			processMessage(msg);
 		}
 
-		if (inputs[INPUT_0].isConnected()) {
+		// process inputs
+		for (int i = 0; i < NUM_INPUTS; i++) {
+			if (inputs[i].isConnected()) {
 
-			// if the input value of 1 triggers the schmittrigger to flip HIGH
-			if (input0OnTrigger.process(inputs[INPUT_0].value)) {
-				lights[LED_0].setBrightness(1.f);
-				int value = 17;
-				midiOutput.setCc(value, MIDI_CC_BINARY);
-			}
+				// if the input value of 1 triggers the schmittrigger to flip HIGH
+				if (ins[i].triggerOn.process(inputs[i].value)) {
+					lights[i].setBrightness(1.f);
+					midiOutput.setCc(ins[i].controllerOn, MIDI_CC_BINARY);
+				}
 
-			// if the input value of 0 triggers the schmittrigger to flip HIGH
-			if (input0OffTrigger.process(1 - inputs[INPUT_0].value)) {
-				lights[LED_0].setBrightness(0);
-				int value = 16;
-				midiOutput.setCc(value, MIDI_CC_BINARY);
+				// if the input value of 0 triggers the schmittrigger to flip HIGH
+				if (ins[i].triggerOff.process(1 - inputs[i].value)) {
+					lights[i].setBrightness(0);
+					midiOutput.setCc(ins[i].controllerOff, MIDI_CC_BINARY);
+				}
 			}
 		}
 	}
