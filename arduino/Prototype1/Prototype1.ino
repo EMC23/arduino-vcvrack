@@ -56,7 +56,7 @@ void loop() {
 
 			// type = rx.byte1 & 0xf0, channel = rx.byte1 & 0xf) + 1
       if ((rx.byte1 & 0xf0) == MIDI_CC_TYPE && (rx.byte1 & 0xf) == MIDI_CHANNEL && rx.byte2 == MIDI_CC_BINARY) {
-        if (rx.byte3 >= 16 && rx.byte3 < 31) {
+        if (rx.byte3 >= 16 && rx.byte3 <= 31) {
           int ledIndex = (int)(rx.byte3 - 16) / 2;
           digitalWrite(ledIndex, rx.byte3 % 2 == 1);
         }
