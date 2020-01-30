@@ -2,6 +2,13 @@
 
 #define MIDI_CC_BINARY 14
 #define MIDI_CC_POTMETER 15
+#define MIDI_CC_STATUS 0xb
+#define PUSH_BUTTON_OFF 8
+#define PUSH_BUTTON_ON 9
+#define ENCODER_BUTTON_OFF 10
+#define ENCODER_BUTTON_ON 11
+#define ENCODER_OUTPUT_A 12
+#define ENCODER_OUTPUT_B 13
 
 /**
  * 
@@ -90,7 +97,7 @@ struct Prototype1Test : Module {
   void process(const ProcessArgs& args) override {
 		midi::Message msg;
 		while (midiInput.shift(&msg)) {
-			processMessage(msg);
+			processMIDIInputMessage(msg);
 		}
 
 		// process inputs
@@ -111,39 +118,45 @@ struct Prototype1Test : Module {
 			}
 		}
 	}
-
-	void processMessage(midi::Message msg) {
+	
+	void processMIDIInputMessage(midi::Message msg) {
 		switch (msg.getStatus()) {
-			// note off
-			case 0x8: {
-				releaseNote(msg.getNote());
-			} break;
-			// note on
-			case 0x9: {
-				if (msg.getValue() > 0) {
-					pressNote(msg.getNote(), msg.getValue());
-				}
-				else {
-					// Many stupid keyboards send a "note on" command with 0 velocity to mean "note release"
-					releaseNote(msg.getNote());
-				}
-			} break;
-			default: break;
+			case MIDI_CC_STATUS:
+				processMIDIInputCC(msg.bytes, msg.size);
+				break;
+			default:
+				break;
 		}
 	}
 
-	void pressNote(uint8_t note, uint8_t vel) {
-		lights[LED_0].setBrightness(1.f);
-
-		midiOutput.setVelocity(0, 1);
-		midiOutput.setNoteGate(60, false, 1);
-	}
-
-	void releaseNote(uint8_t note) {
-		lights[LED_0].setBrightness(0.f);
-
-		midiOutput.setVelocity(100, 1);
-		midiOutput.setNoteGate(60, true, 1);
+	void processMIDIInputCC(uint8_t* bytes, uint8_t size) {
+		if (size == 3) {
+			switch (bytes[1]) {
+				case MIDI_CC_BINARY:
+					switch (bytes[2]) {
+						case PUSH_BUTTON_OFF:
+							break;
+						case PUSH_BUTTON_ON:
+							break;
+						case ENCODER_BUTTON_OFF:
+							break;
+						case ENCODER_BUTTON_ON:
+							break;
+						case ENCODER_OUTPUT_A:
+							break;
+						case ENCODER_OUTPUT_B:
+							break;
+						default:
+							break;
+					}
+					break;
+				case MIDI_CC_POTMETER:
+					
+					break;
+				default:
+					break;
+			}
+		}
 	}
 
 	/**

@@ -94,7 +94,7 @@ void loop() {
   }
   if (encoderAState != digitalRead(PIN_ENCODER_A)) {
     encoderAState = digitalRead(PIN_ENCODER_A);
-    int encoderOutputCCValue = digitalRead(PIN_ENCODER_B) != encoderAState ? 14 : 13;
+    int encoderOutputCCValue = digitalRead(PIN_ENCODER_B) != encoderAState ? 13 : 12;
     sendMIDIMessage(0x0b, MIDI_CC_TYPE | MIDI_CHANNEL, MIDI_CC_BINARY, encoderOutputCCValue);
     // if (digitalRead(PIN_ENCODER_B) != encoderAState) {
     //   encoderCounter--;
