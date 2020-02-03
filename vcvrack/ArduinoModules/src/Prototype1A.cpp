@@ -57,6 +57,9 @@ struct Prototype1A : Module {
 		NUM_INPUTS
 	};
 	enum OutputIds {
+		OUTPUT_POTMETER,
+		OUTPUT_POTMETER_INVERSE,
+		OUTPUT_PUSHBUTTON,
 		NUM_OUTPUTS
 	};
 	enum LightIds {
@@ -132,11 +135,13 @@ struct Prototype1A : Module {
 	void processMIDIInputCC(uint8_t* bytes, uint8_t size) {
 		if (size == 3) {
 			switch (bytes[1]) {
-				case MIDI_CC_BINARY:
+				case MIDI_CC_BINARY: {
 					switch (bytes[2]) {
 						case PUSH_BUTTON_OFF:
+							outputs[OUTPUT_PUSHBUTTON].value = 0;
 							break;
 						case PUSH_BUTTON_ON:
+							outputs[OUTPUT_PUSHBUTTON].value = 5;
 							break;
 						case ENCODER_BUTTON_OFF:
 							break;
@@ -150,9 +155,13 @@ struct Prototype1A : Module {
 							break;
 					}
 					break;
-				case MIDI_CC_POTMETER:
-					
+				}
+				case MIDI_CC_POTMETER: {
+					double potmeterValue = (bytes[2] / 127.f) * 5.f;
+					outputs[OUTPUT_POTMETER].value = potmeterValue;
+					outputs[OUTPUT_POTMETER_INVERSE].value = 5 - potmeterValue;
 					break;
+				}
 				default:
 					break;
 			}
@@ -222,6 +231,10 @@ struct Prototype1AWidget : ModuleWidget {
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(center - 4.5, 105)), module, Prototype1A::INPUT_5));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(center + 4.5, 105)), module, Prototype1A::INPUT_6));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(center + 13.5, 105)), module, Prototype1A::INPUT_7));
+		
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(center - 13.5, 115)), module, Prototype1A::OUTPUT_POTMETER));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(center - 4.5, 115)), module, Prototype1A::OUTPUT_POTMETER_INVERSE));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(center + 4.5, 115)), module, Prototype1A::OUTPUT_PUSHBUTTON));
   }
 };
 
