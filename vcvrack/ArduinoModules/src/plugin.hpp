@@ -9,4 +9,4 @@ extern Plugin* pluginInstance;
 
 // Declare each Model, defined in each module source file
 extern Model* modelArduinoMIDI;
-extern Model* modelPrototype1Test;
+extern Model* modelPrototype1A;
