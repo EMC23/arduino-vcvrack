@@ -24,8 +24,8 @@
       ]
     },
     {
-      "slug": "Prototype1Test",
-      "name": "Prototype 1 Test",
+      "slug": "Prototype1A",
+      "name": "Prototype 1A",
       "description": "Test Prototype communication using MIDI",
       "tags": [
         "Controller",

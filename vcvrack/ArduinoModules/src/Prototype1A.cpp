@@ -60,6 +60,7 @@ struct Prototype1A : Module {
 		OUTPUT_POTMETER,
 		OUTPUT_POTMETER_INVERSE,
 		OUTPUT_PUSHBUTTON,
+		OUTPUT_ENCODER,
 		NUM_OUTPUTS
 	};
 	enum LightIds {
@@ -77,6 +78,7 @@ struct Prototype1A : Module {
   midi::InputQueue midiInput;
   MidiOutput midiOutput;
 	struct input ins[NUM_INPUTS];
+	float encoderValue = 0;
 
   Prototype1A() {
     config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -147,10 +149,16 @@ struct Prototype1A : Module {
 							break;
 						case ENCODER_BUTTON_ON:
 							break;
-						case ENCODER_OUTPUT_A:
+						case ENCODER_OUTPUT_A: {
+							encoderValue -= (1/12);
+							outputs[OUTPUT_ENCODER].value = encoderValue;
 							break;
-						case ENCODER_OUTPUT_B:
+						}
+						case ENCODER_OUTPUT_B: {
+							encoderValue += (1/12);
+							outputs[OUTPUT_ENCODER].value = encoderValue;
 							break;
+						}
 						default:
 							break;
 					}
@@ -235,6 +243,7 @@ struct Prototype1AWidget : ModuleWidget {
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(center - 13.5, 115)), module, Prototype1A::OUTPUT_POTMETER));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(center - 4.5, 115)), module, Prototype1A::OUTPUT_POTMETER_INVERSE));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(center + 4.5, 115)), module, Prototype1A::OUTPUT_PUSHBUTTON));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(center + 13.5, 115)), module, Prototype1A::OUTPUT_ENCODER));
   }
 };
 
