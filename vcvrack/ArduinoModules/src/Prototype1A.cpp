@@ -79,6 +79,7 @@ struct Prototype1A : Module {
   MidiOutput midiOutput;
 	struct input ins[NUM_INPUTS];
 	float encoderValue = 0;
+	float noteVoltage = 1.0f / 12.0f;
 
   Prototype1A() {
     config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -150,12 +151,12 @@ struct Prototype1A : Module {
 						case ENCODER_BUTTON_ON:
 							break;
 						case ENCODER_OUTPUT_A: {
-							encoderValue -= (1/12);
+							encoderValue -= noteVoltage;
 							outputs[OUTPUT_ENCODER].value = encoderValue;
 							break;
 						}
 						case ENCODER_OUTPUT_B: {
-							encoderValue += (1/12);
+							encoderValue += noteVoltage;
 							outputs[OUTPUT_ENCODER].value = encoderValue;
 							break;
 						}
