@@ -6,7 +6,7 @@ Two way communication between an Arduino board and a VCV Rack module.
 
 The VCV Rack modules are part of the plugin Arduino Modules located at `/vcvrack/ArduinoModules`.
 
-## First prototype
+## First Arduino prototype
 
 The first prototype is an Arduino Leonardo that communicates with a VCV Rack module using MIDI. The purpose of this prototype is to understand how to interact with different components. A basic set of components are connected to the Arduino:
 
@@ -64,8 +64,18 @@ All MIDI communication uses Continuous Controllers 14 and 15 because they are 'o
 
 <img src="assets/img/prototype1_top_2020-01-16_1200.jpg" alt="Prototype 1" style="max-width:480px;">
 
+## Arduino sketch and VCV Rack module 'Prototype 1A'
 
+This first prototype just implements communication between the Arduino and the VCV Rack module, nothing more. So it's actually a MIDI controller with the added functionality that it can monitor 8 gate signals with the 8 LEDs.
 
+- Potmeter, pushbutton and rotary encoder changes are sent to the module, where their values are presented on four output connectors.
+  - Potmeter value as 0 to 5 volts.
+  - Potmeter value inverted, 5 to 0 volt.
+  - Pushbutton state as 0 or 5 volt (5 is pushed state).
+  - Encoder changes as de- or increments of 1/12th volt (or 1 note chromatically down or up, the V/Oct. scaling)
+- Eight inputs on the VCV Rack module show their input values on the Arduino panel's eight LEDs.
+  - A LED switches on as soon as the input reaches 5 volt.
+  - A LED switches off when the input reaches 0 volt.
 
 ## Notes
 
