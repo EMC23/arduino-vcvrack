@@ -3,10 +3,51 @@
 #include <MIDIUSB.h>
 #include <uClock.h>
 
-// MIDI clock, start and stop byte definitions - based on MIDI 1.0 Standards.
+// #define MIDI_MODE
+#define SERIAL_MODE
 #define MIDI_CLOCK 0xF8
 #define MIDI_START 0xFA
-#define MIDI_STOP  0xFC
+#define MIDI_STOP 0xFC
+#define NOTE_ON 0x90
+#define NOTE_OFF 0x80
+#define NUM_LEDS 8
+#define MIDI_CHANNEL 0
+
+bool isNoteOn = false;
+bool isClockOn = false;
+
+void clockOut16PPQN() {
+  if (isNoteOn) {
+    sendMIDIMessage(0x09, NOTE_ON | MIDI_CHANNEL, 60, 100);
+    digitalWrite(2, 1);
+  } else {
+    sendMIDIMessage(0x08, NOTE_OFF | MIDI_CHANNEL, 60, 100);
+    digitalWrite(2, 0);
+  }
+  isNoteOn = !isNoteOn;
+}
+
+// The callback function wich will be called by Clock each Pulse of 96PPQN clock resolution.
+void clockOut96PPQN(uint32_t * tick) {
+  // Send MIDI_CLOCK to external gears
+  // Serial.write(MIDI_CLOCK);
+  if (isClockOn) {
+    digitalWrite(1, 1);
+  } else {
+    digitalWrite(1, 0);
+  }
+  isClockOn = !isClockOn;
+}
+
+// The callback function wich will be called when clock starts by using Clock.start() method.
+void onClockStart() {
+  Serial.write(MIDI_START);
+}
+
+// The callback function wich will be called when clock stops by using Clock.stop() method.
+void onClockStop() {
+  Serial.write(MIDI_STOP);
+}
 
 void sendMIDIMessage(uint8_t header, uint8_t byte0, uint8_t byte1, uint8_t byte2) {
   midiEventPacket_t midiEvent = {header, byte0, byte1, byte2};
@@ -14,48 +55,36 @@ void sendMIDIMessage(uint8_t header, uint8_t byte0, uint8_t byte1, uint8_t byte2
   MidiUSB.flush();
 }
 
-// The callback function wich will be called by Clock each Pulse of 96PPQN clock resolution.
-void ClockOut96PPQN(uint32_t * tick) 
-{
-  // Send MIDI_CLOCK to external gears
-  Serial.write(MIDI_CLOCK);
-}
+// void updateLEDs(int index, int isOn) {
+//   for (int i = 0; i < NUM_LEDS; i++) {
+//     digitalWrite(i, i == index ? isOn : 0);
+//   }
+// }
 
-// The callback function wich will be called when clock starts by using Clock.start() method.
-void onClockStart() 
-{
-  Serial.write(MIDI_START);
-}
+void setup() {
+  #ifdef MIDI_MODE
+    // the default MIDI serial speed communication at 31250 bits per second
+    Serial.begin(31250); 
+  #endif
+  #ifdef SERIAL_MODE
+    // for usage with a PC with a serial to MIDI bridge
+    Serial.begin(115200);
+  #endif
 
-// The callback function wich will be called when clock stops by using Clock.stop() method.
-void onClockStop() 
-{
-  Serial.write(MIDI_STOP);
-}
-
-void setup() 
-{
-
-  // Initialize serial communication at 31250 bits per second, the default MIDI serial speed communication:
-  Serial.begin(31250);
-
-  // Inits the clock
   uClock.init();
+  uClock.setClock16PPQNOutput(clockOut16PPQN);  
   // Set the callback function for the clock output to send MIDI Sync message.
-  uClock.setClock96PPQNOutput(ClockOut96PPQN);
+  uClock.setClock96PPQNOutput(clockOut96PPQN);
   // Set the callback function for MIDI Start and Stop messages.
   uClock.setOnClockStartOutput(onClockStart);  
   uClock.setOnClockStopOutput(onClockStop);
   // Set the clock BPM to 126 BPM
-  uClock.setTempo(126);
+  uClock.setTempo(110);
 
   // Starts the clock, tick-tac-tick-tac...
   uClock.start();
-
 }
 
-// Do it whatever to interface with Clock.stop(), Clock.start(), Clock.setTempo() and integrate your environment...
-void loop() 
-{
+void loop() {
 
 }
