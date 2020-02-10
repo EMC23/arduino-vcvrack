@@ -217,34 +217,35 @@ struct Prototype1AWidget : ModuleWidget {
 		midiInputWidget->setMidiPort(module ? &module->midiInput : NULL);
 		addChild(midiInputWidget);
 
-		MidiWidget* midiOutputWidget = createWidget<MidiWidget>(mm2px(Vec(3.41891, 46)));
+		MidiWidget* midiOutputWidget = createWidget<MidiWidget>(mm2px(Vec(3.41891, 45)));
 		midiOutputWidget->box.size = mm2px(Vec(33.840, 28));
 		midiOutputWidget->setMidiPort(module ? &module->midiOutput : NULL);
 		addChild(midiOutputWidget);
 
 		float center = 20.25;
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(center - 9, 80)), module, Prototype1A::LED_0));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(center - 3, 80)), module, Prototype1A::LED_1));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(center + 3, 80)), module, Prototype1A::LED_2));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(center + 9, 80)), module, Prototype1A::LED_3));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(center - 9, 86)), module, Prototype1A::LED_4));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(center - 3, 86)), module, Prototype1A::LED_5));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(center + 3, 86)), module, Prototype1A::LED_6));
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(center + 9, 86)), module, Prototype1A::LED_7));
+		float y = 78;
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(center - 9, y)), module, Prototype1A::LED_0));
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(center - 3, y)), module, Prototype1A::LED_1));
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(center + 3, y)), module, Prototype1A::LED_2));
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(center + 9, y)), module, Prototype1A::LED_3));
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(center - 9, y + 6)), module, Prototype1A::LED_4));
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(center - 3, y + 6)), module, Prototype1A::LED_5));
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(center + 3, y + 6)), module, Prototype1A::LED_6));
+		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(center + 9, y + 6)), module, Prototype1A::LED_7));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(center - 13.5, 95)), module, Prototype1A::INPUT_0));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(center - 4.5, 95)), module, Prototype1A::INPUT_1));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(center + 4.5, 95)), module, Prototype1A::INPUT_2));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(center + 13.5, 95)), module, Prototype1A::INPUT_3));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(center - 13.5, 105)), module, Prototype1A::INPUT_4));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(center - 4.5, 105)), module, Prototype1A::INPUT_5));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(center + 4.5, 105)), module, Prototype1A::INPUT_6));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(center + 13.5, 105)), module, Prototype1A::INPUT_7));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(center - 13.5, y + 14)), module, Prototype1A::INPUT_0));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(center - 4.5, y + 14)), module, Prototype1A::INPUT_1));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(center + 4.5, y + 14)), module, Prototype1A::INPUT_2));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(center + 13.5, y + 14)), module, Prototype1A::INPUT_3));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(center - 13.5, y + 24)), module, Prototype1A::INPUT_4));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(center - 4.5, y + 24)), module, Prototype1A::INPUT_5));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(center + 4.5, y + 24)), module, Prototype1A::INPUT_6));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(center + 13.5, y + 24)), module, Prototype1A::INPUT_7));
 		
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(center - 13.5, 115)), module, Prototype1A::OUTPUT_POTMETER));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(center - 4.5, 115)), module, Prototype1A::OUTPUT_POTMETER_INVERSE));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(center + 4.5, 115)), module, Prototype1A::OUTPUT_PUSHBUTTON));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(center + 13.5, 115)), module, Prototype1A::OUTPUT_ENCODER));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(center - 13.5, y + 36)), module, Prototype1A::OUTPUT_POTMETER));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(center - 4.5, y + 36)), module, Prototype1A::OUTPUT_POTMETER_INVERSE));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(center + 4.5, y + 36)), module, Prototype1A::OUTPUT_PUSHBUTTON));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(center + 13.5, y + 36)), module, Prototype1A::OUTPUT_ENCODER));
   }
 };
 
