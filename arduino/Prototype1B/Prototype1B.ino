@@ -5,46 +5,36 @@
 
 // #define MIDI_MODE
 #define SERIAL_MODE
-#define MIDI_CLOCK 0xF8
-#define MIDI_START 0xFA
-#define MIDI_STOP 0xFC
 #define NOTE_ON 0x90
 #define NOTE_OFF 0x80
 #define NUM_LEDS 8
 #define MIDI_CHANNEL 0
+#define PATTERN_LENGTH 16
 
-bool isNoteOn = false;
-bool isClockOn = false;
+bool isPlaying = false;
+bool isMessage = false;
+bool pattern[PATTERN_LENGTH] = [100,0,0,0,100,0,0,0,100,0,0,0,100,0,50,0];
 
 void clockOut16PPQN(uint32_t * tick) {
-  if (isNoteOn) {
-    sendMIDIMessage(0x09, NOTE_ON | MIDI_CHANNEL, 60, 100);
-    digitalWrite(2, true);
-  } else {
-    sendMIDIMessage(0x08, NOTE_OFF | MIDI_CHANNEL, 60, 0);
+  isMessage = false;
+  if (isPlaying) {
+    isPlaying = false;
+    midiEventPacket_t midiEvent = {0x08, NOTE_OFF | MIDI_CHANNEL, 60, 0};
+    MidiUSB.sendMIDI(midiEvent);
     digitalWrite(2, false);
+    isMessage = true;
   }
-  isNoteOn = !isNoteOn;
-}
-
-// The callback function wich will be called by Clock each Pulse of 96PPQN clock resolution.
-void clockOut96PPQN(uint32_t * tick) {
-  if (isClockOn) {
-    digitalWrite(1, true);
-  } else {
-    digitalWrite(1, false);
+  int index = tick % PATTERN_LENGTH;
+  if (pattern[index] > 0) {
+    isPlaying = true;
+    midiEventPacket_t midiEvent = {0x09, NOTE_ON | MIDI_CHANNEL, 60, pattern[index]};
+    MidiUSB.sendMIDI(midiEvent);
+    digitalWrite(2, true);
+    isMessage = true;
   }
-  isClockOn = !isClockOn;
-}
-
-// The callback function wich will be called when clock starts by using Clock.start() method.
-void onClockStart() {
-  Serial.write(MIDI_START);
-}
-
-// The callback function wich will be called when clock stops by using Clock.stop() method.
-void onClockStop() {
-  Serial.write(MIDI_STOP);
+  if (isMessage) {
+    MidiUSB.flush();
+  }
 }
 
 void sendMIDIMessage(uint8_t header, uint8_t byte0, uint8_t byte1, uint8_t byte2) {
@@ -65,18 +55,8 @@ void setup() {
 
   uClock.init();
   uClock.setClock16PPQNOutput(clockOut16PPQN);
-  // Set the callback function for the clock output to send MIDI Sync message.
-  uClock.setClock96PPQNOutput(clockOut96PPQN);
-  // Set the callback function for MIDI Start and Stop messages.
-  uClock.setOnClockStartOutput(onClockStart);  
-  uClock.setOnClockStopOutput(onClockStop);
-  // Set the clock BPM to 126 BPM
   uClock.setTempo(100);
-
-  // Starts the clock, tick-tac-tick-tac...
   uClock.start();
 }
 
-void loop() {
-
-}
+void loop() {}

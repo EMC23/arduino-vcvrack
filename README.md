@@ -77,6 +77,22 @@ This first prototype just implements communication between the Arduino and the V
   - A LED switches on as soon as the input reaches 5 volt.
   - A LED switches off when the input reaches 0 volt.
 
+## Arduino sketch 'Prototype 1B'
+
+The Prototype 1B sketch is a MIDI pattern generator. It sends MIDI notes over USB.
+
+The uClock library generates a procise clock for the patterns.
+
+uClock by Midilab:<br>
+website: http://midilab.co/<br>
+source: https://github.com/midilab/uClock
+
+
+
+
+
+
+
 ## Notes
 
 ### libusb
