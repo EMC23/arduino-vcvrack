@@ -3,8 +3,6 @@
 #include <MIDIUSB.h>
 #include <uClock.h>
 
-// #define MIDI_MODE
-#define SERIAL_MODE
 #define NOTE_ON 0x90
 #define NOTE_OFF 0x80
 #define NUM_LEDS 8
@@ -13,9 +11,9 @@
 
 bool isPlaying = false;
 bool isMessage = false;
-bool pattern[PATTERN_LENGTH] = [100,0,0,0,100,0,0,0,100,0,0,0,100,0,50,0];
+int pattern[PATTERN_LENGTH] = {100,0,0,0,100,0,0,0,100,0,0,0,100,0,50,0};
 
-void clockOut16PPQN(uint32_t * tick) {
+void clockOut16PPQN(uint32_t* tick) {
   isMessage = false;
   if (isPlaying) {
     isPlaying = false;
@@ -24,7 +22,7 @@ void clockOut16PPQN(uint32_t * tick) {
     digitalWrite(2, false);
     isMessage = true;
   }
-  int index = tick % PATTERN_LENGTH;
+  uint32_t index = *tick % PATTERN_LENGTH;
   if (pattern[index] > 0) {
     isPlaying = true;
     midiEventPacket_t midiEvent = {0x09, NOTE_ON | MIDI_CHANNEL, 60, pattern[index]};
@@ -44,15 +42,6 @@ void sendMIDIMessage(uint8_t header, uint8_t byte0, uint8_t byte1, uint8_t byte2
 }
 
 void setup() {
-  #ifdef MIDI_MODE
-    // the default MIDI serial speed communication at 31250 bits per second
-    Serial.begin(31250); 
-  #endif
-  #ifdef SERIAL_MODE
-    // for usage with a PC with a serial to MIDI bridge
-    Serial.begin(115200);
-  #endif
-
   uClock.init();
   uClock.setClock16PPQNOutput(clockOut16PPQN);
   uClock.setTempo(100);
