@@ -15,11 +15,13 @@
 #define NUM_PATTERNS_PER_BANK 4
 #define MAX_EVENTS_PER_PATTERN 100
 
-bool isPlaying = false;
-bool isMessage = false;
+bool is_playing = false;
+bool is_message = false;
+uint8_t bank_index = 0;
+uint8_t ptrn_index = 0;
 
 struct midiEvent {
-  uint32_t timeTag;
+  uint32_t time_tag;
   uint8_t header;
   uint8_t byte1;
   uint8_t byte2;
@@ -27,7 +29,7 @@ struct midiEvent {
 };
 
 struct midiEvent patterns[NUM_BANKS][NUM_PATTERNS_PER_BANK][MAX_EVENTS_PER_PATTERN];
-int patternPointers[NUM_BANKS][NUM_PATTERNS_PER_BANK];
+int pattern_pointers[NUM_BANKS][NUM_PATTERNS_PER_BANK];
 
 // struct midiEvent kickPattern[] = {100,0,0,0,100,0,0,0,100,0,0,0,100,0,50,0};
 // struct midiEvent kickPattern[] = {
@@ -37,10 +39,10 @@ int patternPointers[NUM_BANKS][NUM_PATTERNS_PER_BANK];
 /**
  * 
  */
-void initPatternPointers() {
+void init_pattern_pointers() {
   for (int i = 0; i < NUM_BANKS; i++) {
     for (int j = 0; j < NUM_PATTERNS_PER_BANK; j++) {
-      patternPointers[i][j] = 0;
+      pattern_pointers[i][j] = 0;
     }
   }
 }
@@ -55,29 +57,29 @@ void initPatternPointers() {
  * @param pitch Note pitch.
  * @param velocity Note velocity.
  */
-void addMidiNote(int bank, int pattern, uint32_t time, uint32_t duration, uint8_t channel, uint8_t pitch, uint8_t velocity) {
-  int eventIndex = patternPointers[bank][pattern];
-  if (bank < NUM_BANKS && pattern < NUM_PATTERNS_PER_BANK && eventIndex + 1 < MAX_EVENTS_PER_PATTERN) {
-    patterns[bank][pattern][eventIndex] = { time, NOTE_ON_HEADER, (uint8_t)NOTE_ON | channel, pitch, velocity };
-    patternPointers[bank][pattern]++;
-    patterns[bank][pattern][eventIndex] = { time, NOTE_OFF_HEADER, (uint8_t)NOTE_OFF | channel, pitch, 0 };
-    patternPointers[bank][pattern]++;
+void add_midi_note(uint8_t bank, uint8_t pattern, uint32_t time, uint32_t duration, uint8_t channel, uint8_t pitch, uint8_t velocity) {
+  int event_index = pattern_pointers[bank][pattern];
+  if (bank < NUM_BANKS && pattern < NUM_PATTERNS_PER_BANK && event_index + 1 < MAX_EVENTS_PER_PATTERN) {
+    patterns[bank][pattern][event_index] = { time, NOTE_ON_HEADER, (uint8_t)NOTE_ON | channel, pitch, velocity };
+    pattern_pointers[bank][pattern]++;
+    patterns[bank][pattern][event_index] = { time, NOTE_OFF_HEADER, (uint8_t)NOTE_OFF | channel, pitch, 0 };
+    pattern_pointers[bank][pattern]++;
   }
 }
 
 /**
  * 
  */
-void createKicks() {
-  int bank = 0;
-  int pattern = 0;
+void create_kicks() {
+  uint8_t bank = 0;
+  uint8_t pattern = 0;
   uint8_t channel = 10;
   uint8_t pitch = 60;
-  addMidiNote(bank, pattern, PPQN * 0, 48, channel, pitch, 100);
-  addMidiNote(bank, pattern, PPQN * 1, 48, channel, pitch, 100);
-  addMidiNote(bank, pattern, PPQN * 2, 48, channel, pitch, 100);
-  addMidiNote(bank, pattern, PPQN * 3, 48, channel, pitch, 100);
-  addMidiNote(bank, pattern, PPQN * 3.75, 48, channel, pitch, 50);
+  add_midi_note(bank, pattern, PPQN * 0, 48, channel, pitch, 100);
+  add_midi_note(bank, pattern, PPQN * 1, 48, channel, pitch, 100);
+  add_midi_note(bank, pattern, PPQN * 2, 48, channel, pitch, 100);
+  add_midi_note(bank, pattern, PPQN * 3, 48, channel, pitch, 100);
+  add_midi_note(bank, pattern, PPQN * 3.75, 48, channel, pitch, 50);
 
   pattern = 1;
 }
@@ -85,15 +87,15 @@ void createKicks() {
 /**
  * Order each pattern's events chronologically
  */
-void orderEvents() {}
+void order_events() {}
 
 /**
  * 
  */
-void createPatterns() {
-  initPatternPointers();
-  createKicks();
-  orderEvents();
+void create_patterns() {
+  init_pattern_pointers();
+  create_kicks();
+  order_events();
 }
 
 void clockOut96PPQN(uint32_t* tick) {
@@ -101,23 +103,23 @@ void clockOut96PPQN(uint32_t* tick) {
 }
 
 // void clockOut16PPQN(uint32_t* tick) {
-//   isMessage = false;
-//   if (isPlaying) {
-//     isPlaying = false;
+//   is_message = false;
+//   if (is_playing) {
+//     is_playing = false;
 //     midiEventPacket_t midiEvent = {0x08, NOTE_OFF | MIDI_CHANNEL, 60, 0};
 //     MidiUSB.sendMIDI(midiEvent);
 //     digitalWrite(2, false);
-//     isMessage = true;
+//     is_message = true;
 //   }
 //   uint32_t index = *tick % PATTERN_LENGTH;
 //   if (pattern[index] > 0) {
-//     isPlaying = true;
+//     is_playing = true;
 //     midiEventPacket_t midiEvent = {0x09, NOTE_ON | MIDI_CHANNEL, 60, pattern[index]};
 //     MidiUSB.sendMIDI(midiEvent);
 //     digitalWrite(2, true);
-//     isMessage = true;
+//     is_message = true;
 //   }
-//   if (isMessage) {
+//   if (is_message) {
 //     MidiUSB.flush();
 //   }
 // }
@@ -132,7 +134,7 @@ void sendMIDIMessage(uint8_t header, uint8_t byte0, uint8_t byte1, uint8_t byte2
 }
 
 void setup() {
-  createPatterns();
+  create_patterns();
   uClock.init();
   uClock.setClock96PPQNOutput(clockOut96PPQN);
   uClock.setTempo(100);
