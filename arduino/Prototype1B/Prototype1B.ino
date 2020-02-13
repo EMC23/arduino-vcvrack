@@ -13,24 +13,24 @@
 #define NUM_BANKS 4
 #define NUM_PATTERNS_PER_BANK 4
 #define MAX_EVENTS_PER_PATTERN 12
+// PATTERN_DURATION 4 * 96 = 384 = 16 steps of 24 ticks
+#define PATTERN_DURATION 384
 
-bool is_playing = false;
-bool is_message = false;
 uint8_t bank_index = 0;
 uint8_t ptrn_index = 0;
 
 struct midi_event {
   uint32_t time_tag;
   uint8_t header;
+  uint8_t byte0;
   uint8_t byte1;
   uint8_t byte2;
-  uint8_t byte3;
 };
 
 struct pattern {
   struct midi_event events[MAX_EVENTS_PER_PATTERN];
   uint8_t index;
-  uint8_t length;
+  uint8_t num_events;
 };
 
 struct pattern patterns[NUM_BANKS][NUM_PATTERNS_PER_BANK];
@@ -51,10 +51,10 @@ void add_midi_note(uint8_t bank_index, uint8_t ptrn_index, uint32_t time, uint32
     if (pattern_p->index + 1 < MAX_EVENTS_PER_PATTERN) {
       pattern_p->events[pattern_p->index] = { time, NOTE_ON_HEADER, (uint8_t)NOTE_ON | channel, pitch, velocity };
       pattern_p->index++;
-      pattern_p->length++;
+      pattern_p->num_events++;
       pattern_p->events[pattern_p->index] = { time, NOTE_OFF_HEADER, (uint8_t)NOTE_OFF | channel, pitch, 0 };
       pattern_p->index++;
-      pattern_p->length++;
+      pattern_p->num_events++;
     }
   }
 }
@@ -85,7 +85,7 @@ void order_events() {
   for (i = 0; i < NUM_BANKS; i++) {
     for (j = 0; j < NUM_PATTERNS_PER_BANK; j++) {
       struct pattern* pattern_p = &patterns[i][j];
-      ptrn_length = pattern_p->length;
+      ptrn_length = pattern_p->num_events;
       for (k = 0; k < ptrn_length; ++k) {
         for (l = 0; l < ptrn_length; ++l) {
           if (pattern_p->events[k].time_tag > pattern_p->events[l].time_tag) {
@@ -107,16 +107,51 @@ void create_patterns() {
   order_events();
 }
 
+/**
+ * 
+ */
 void clockOut96PPQN(uint32_t* tick) {
+  struct pattern* pattern_p = &patterns[bank_index][ptrn_index];
+  struct midi_event* event_p = &pattern_p->events[pattern_p->index];
 
+  // time position within pattern
+  uint16_t ptrn_tick = (uint16_t)(*tick % PATTERN_DURATION);
+  if (ptrn_tick == 0) {
+    pattern_p->index = 0;
+  }
+  
+  uint8_t loop_count = 0;
+  while (event_p->time_tag >= ptrn_tick) {
+    midiEventPacket_t event_packet = {event_p->header, event_p->byte0, event_p->byte1, event_p->byte2};
+    MidiUSB.sendMIDI(event_packet);
+
+    // check for last event in pattern
+    if (pattern_p->index == pattern_p->num_events) {
+      break;
+    }
+
+    // update pattern event index
+    pattern_p->index++;
+    if (pattern_p->index == pattern_p->num_events) {
+      pattern_p->index = 0;
+    }
+
+    // prevent infinite loop
+    loop_count++;
+    if (loop_count == 10) {
+      break;
+    }
+  }
+  
+  MidiUSB.flush();
 }
 
 /**
  * 
  */
-void sendMIDIMessage(uint8_t header, uint8_t byte0, uint8_t byte1, uint8_t byte2) {
-  midiEventPacket_t midi_event = {header, byte0, byte1, byte2};
-  MidiUSB.sendMIDI(midi_event);
+void sendMIDIMessage(struct midi_event* event_p) {
+  midiEventPacket_t event_packet = {event_p->header, event_p->byte0, event_p->byte1, event_p->byte2};
+  MidiUSB.sendMIDI(event_packet);
   MidiUSB.flush();
 }
 
