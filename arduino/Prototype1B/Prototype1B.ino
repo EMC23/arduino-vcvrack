@@ -3,7 +3,7 @@
 #include <MIDIUSB.h>
 #include <uClock.h>
 
-#define PPQN 96
+#define PPQN 24
 #define NOTE_ON_HEADER 0x09
 #define NOTE_OFF_HEADER 0x09
 #define NOTE_ON 0x90
@@ -13,8 +13,8 @@
 #define NUM_BANKS 4
 #define NUM_PATTERNS_PER_BANK 4
 #define MAX_EVENTS_PER_PATTERN 12
-// PATTERN_DURATION 4 * 96 = 384 = 16 steps of 24 ticks
-#define PATTERN_DURATION 384
+// PATTERN_DURATION 4 * 24 = 96 = 16 steps of 24 ticks
+#define PATTERN_DURATION 96
 
 uint8_t bank_index = 0;
 uint8_t ptrn_index = 0;
@@ -52,10 +52,29 @@ void add_midi_note(uint8_t bank_index, uint8_t ptrn_index, uint32_t time, uint32
       pattern_p->events[pattern_p->index] = { time, NOTE_ON_HEADER, (uint8_t)NOTE_ON | channel, pitch, velocity };
       pattern_p->index++;
       pattern_p->num_events++;
-      pattern_p->events[pattern_p->index] = { time, NOTE_OFF_HEADER, (uint8_t)NOTE_OFF | channel, pitch, 0 };
+      pattern_p->events[pattern_p->index] = { time + duration, NOTE_OFF_HEADER, (uint8_t)NOTE_OFF | channel, pitch, 0 };
       pattern_p->index++;
       pattern_p->num_events++;
     }
+  }
+}
+
+void print_pattern(uint8_t bank_index, uint8_t ptrn_index) {
+  Serial.print("Pattern: ");
+  Serial.print(bank_index, DEC);
+  Serial.print(", ");
+  Serial.print(ptrn_index, DEC);
+  Serial.println(";");
+  struct pattern* pattern_p = &patterns[bank_index][ptrn_index];
+  for(uint8_t i = 0; i < pattern_p->num_events; i++) {
+    struct midi_event* event_p = &pattern_p->events[i];
+    Serial.print("Event: ");
+    Serial.print(event_p->time_tag, DEC);
+    Serial.print(", ");
+    Serial.print(event_p->header, DEC);
+    Serial.print(", ");
+    Serial.print(event_p->byte0, DEC);
+    Serial.println(";");
   }
 }
 
@@ -67,11 +86,11 @@ void create_kicks() {
   uint8_t pattern = 0;
   uint8_t channel = 10;
   uint8_t pitch = 60;
-  add_midi_note(bank, pattern, PPQN * 0, 48, channel, pitch, 100);
-  add_midi_note(bank, pattern, PPQN * 1, 48, channel, pitch, 100);
-  add_midi_note(bank, pattern, PPQN * 2, 48, channel, pitch, 100);
-  add_midi_note(bank, pattern, PPQN * 3, 48, channel, pitch, 100);
-  add_midi_note(bank, pattern, PPQN * 3.75, 48, channel, pitch, 50);
+  add_midi_note(bank, pattern, PPQN * 0, PPQN * 0.5, channel, pitch, 100);
+  add_midi_note(bank, pattern, PPQN * 1, PPQN * 0.5, channel, pitch, 100);
+  add_midi_note(bank, pattern, PPQN * 2, PPQN * 0.5, channel, pitch, 100);
+  add_midi_note(bank, pattern, PPQN * 3, PPQN * 0.5, channel, pitch, 100);
+  add_midi_note(bank, pattern, PPQN * 3.75, PPQN * 0.1, channel, pitch, 50);
 
   pattern = 1;
 }
@@ -104,37 +123,47 @@ void order_events() {
  */
 void create_patterns() {
   create_kicks();
-  order_events();
+//  order_events();
 }
 
 /**
  * 
  */
 void clockOut96PPQN(uint32_t* tick) {
-  struct pattern* pattern_p = &patterns[bank_index][ptrn_index];
-  struct midi_event* event_p = &pattern_p->events[pattern_p->index];
 
-  // time position within pattern
+  // get the current pattern
+  struct pattern* pattern_p = &patterns[bank_index][ptrn_index];
+
+  // get time position within the pattern
   uint16_t ptrn_tick = (uint16_t)(*tick % PATTERN_DURATION);
   if (ptrn_tick == 0) {
     pattern_p->index = 0;
   }
+
+  // quit if all the pattern's events have been played
+  if (pattern_p->index == pattern_p->num_events) {
+    return;
+  }
+
+  // get next event to play
+  struct midi_event* event_p = &pattern_p->events[pattern_p->index];
   
+  // process all events (if any) to happen on this tick
   uint8_t loop_count = 0;
-  while (event_p->time_tag >= ptrn_tick) {
+  while (event_p->time_tag <= ptrn_tick) {
     midiEventPacket_t event_packet = {event_p->header, event_p->byte0, event_p->byte1, event_p->byte2};
     MidiUSB.sendMIDI(event_packet);
 
-    // check for last event in pattern
+    // update pattern event index
+    pattern_p->index++;
+
+    // quit if this was the last event
     if (pattern_p->index == pattern_p->num_events) {
       break;
     }
 
-    // update pattern event index
-    pattern_p->index++;
-    if (pattern_p->index == pattern_p->num_events) {
-      pattern_p->index = 0;
-    }
+    // get next event to play
+    event_p = &pattern_p->events[pattern_p->index];
 
     // prevent infinite loop
     loop_count++;
@@ -143,7 +172,7 @@ void clockOut96PPQN(uint32_t* tick) {
     }
   }
   
-  MidiUSB.flush();
+   MidiUSB.flush();
 }
 
 /**
@@ -157,6 +186,7 @@ void sendMIDIMessage(struct midi_event* event_p) {
 
 void setup() {
   create_patterns();
+  // print_pattern(0, 0);
   uClock.init();
   uClock.setClock96PPQNOutput(clockOut96PPQN);
   uClock.setTempo(100);
