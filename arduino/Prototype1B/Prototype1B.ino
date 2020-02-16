@@ -81,15 +81,21 @@ void print_pattern(uint8_t bank_index, uint8_t ptrn_index) {
 /**
  * 
  */
-void create_kicks() {
+void create_testpattern() {
   uint8_t bank = 0;
   uint8_t pattern = 0;
   uint8_t channel = 10;
   uint8_t pitch = 60;
   add_midi_note(bank, pattern, PPQN * 0, PPQN * 0.5, channel, pitch, 100);
+  add_midi_note(bank, pattern, PPQN * 0.5, PPQN * 0.5, channel, pitch + 1, 100);
   add_midi_note(bank, pattern, PPQN * 1, PPQN * 0.5, channel, pitch, 100);
+  add_midi_note(bank, pattern, PPQN * 1, PPQN * 0.5, channel, pitch + 2, 100);
+  add_midi_note(bank, pattern, PPQN * 1.5, PPQN * 0.5, channel, pitch + 1, 100);
   add_midi_note(bank, pattern, PPQN * 2, PPQN * 0.5, channel, pitch, 100);
+  add_midi_note(bank, pattern, PPQN * 2.5, PPQN * 0.5, channel, pitch + 1, 100);
   add_midi_note(bank, pattern, PPQN * 3, PPQN * 0.5, channel, pitch, 100);
+  add_midi_note(bank, pattern, PPQN * 3, PPQN * 0.5, channel, pitch + 2, 100);
+  add_midi_note(bank, pattern, PPQN * 3.5, PPQN * 0.5, channel, pitch + 1, 100);
   add_midi_note(bank, pattern, PPQN * 3.75, PPQN * 0.1, channel, pitch, 50);
 
   pattern = 1;
@@ -122,7 +128,7 @@ void order_events() {
  * 
  */
 void create_patterns() {
-  create_kicks();
+  create_testpattern();
 //  order_events();
 }
 
@@ -186,7 +192,7 @@ void sendMIDIMessage(struct midi_event* event_p) {
 
 void setup() {
   create_patterns();
-  // print_pattern(0, 0);
+  print_pattern(0, 0);
   uClock.init();
   uClock.setClock96PPQNOutput(clockOut96PPQN);
   uClock.setTempo(100);
