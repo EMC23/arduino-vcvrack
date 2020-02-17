@@ -111,9 +111,9 @@ void order_events() {
     for (j = 0; j < NUM_PATTERNS_PER_BANK; j++) {
       struct pattern* pattern_p = &patterns[i][j];
       ptrn_length = pattern_p->num_events;
-      for (k = 0; k < ptrn_length; ++k) {
-        for (l = 0; l < ptrn_length; ++l) {
-          if (pattern_p->events[k].time_tag > pattern_p->events[l].time_tag) {
+      for (k = 0; k < ptrn_length; k++) {
+        for (l = 0; l < ptrn_length; l++) {
+          if (pattern_p->events[l].time_tag > pattern_p->events[k].time_tag) {
             swap_event = pattern_p->events[k];
             pattern_p->events[k] = pattern_p->events[l];
             pattern_p->events[l] = swap_event;
