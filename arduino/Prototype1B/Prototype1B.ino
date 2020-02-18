@@ -57,6 +57,9 @@ void clockOut96PPQN(uint32_t* tick) {
     midiEventPacket_t event_packet = {event_p->header, event_p->byte0, event_p->byte1, event_p->byte2};
     MidiUSB.sendMIDI(event_packet);
 
+    // show event on panel, where note pitch 60 lights the first LED
+    digitalWrite(event_p->byte1 - 60, event_p->byte1 & 0xf0 == NOTE_ON);
+
     // update pattern event index
     pattern_p->index++;
 
