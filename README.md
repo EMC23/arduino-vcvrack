@@ -87,6 +87,12 @@ uClock by Midilab:<br>
 website: http://midilab.co/<br>
 source: https://github.com/midilab/uClock
 
+C test compile
+
+```bash
+gcc test.c patterns.c -o test
+```
+
 
 
 
