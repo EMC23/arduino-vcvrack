@@ -1,7 +1,7 @@
 #include "patterns.h"
 
 void add_midi_note(uint8_t bank_index, uint8_t ptrn_index, uint32_t time, uint32_t duration, uint8_t channel, uint8_t pitch, uint8_t velocity) {
-  if (ptrn_index < NUM_BANKS && ptrn_index < NUM_PATTERNS_PER_BANK) {
+  if (bank_index < NUM_BANKS && ptrn_index < NUM_PATTERNS_PER_BANK) {
     struct pattern* pattern_p = &patterns[bank_index][ptrn_index];
     if (pattern_p->index + 1 < MAX_EVENTS_PER_PATTERN) {
       struct midi_event note_on_event = { time, NOTE_ON_HEADER, (uint8_t)NOTE_ON | channel, pitch, velocity };

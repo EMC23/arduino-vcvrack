@@ -1,6 +1,6 @@
 #include "Arduino.h"
-#include <MIDIUSB_Defs.h>
-#include <MIDIUSB.h>
+//#include <MIDIUSB_Defs.h>
+//#include <MIDIUSB.h>
 #include <uClock.h>
 #include "patterns.h"
 
@@ -10,7 +10,7 @@
 uint8_t bank_index = 0;
 uint8_t ptrn_index = 0;
 
-void serial_print_pattern(uint8_t bank_index, uint8_t ptrn_index) {
+void serialPrintPattern(uint8_t bank_index, uint8_t ptrn_index) {
   Serial.print("Pattern: ");
   Serial.print(bank_index, DEC);
   Serial.print(", ");
@@ -54,8 +54,8 @@ void clockOut96PPQN(uint32_t* tick) {
   // process all events (if any) to happen on this tick
   uint8_t loop_count = 0;
   while (event_p->time_tag <= ptrn_tick) {
-    midiEventPacket_t event_packet = {event_p->header, event_p->byte0, event_p->byte1, event_p->byte2};
-    MidiUSB.sendMIDI(event_packet);
+//    midiEventPacket_t event_packet = {event_p->header, event_p->byte0, event_p->byte1, event_p->byte2};
+//    MidiUSB.sendMIDI(event_packet);
 
     // show event on panel, where note pitch 60 lights the first LED
     digitalWrite(event_p->byte1 - 60, event_p->byte1 & 0xf0 == NOTE_ON);
@@ -78,22 +78,22 @@ void clockOut96PPQN(uint32_t* tick) {
     }
   }
   
-   MidiUSB.flush();
+//   MidiUSB.flush();
 }
 
 /**
  * 
  */
-void sendMIDIMessage(struct midi_event* event_p) {
-  midiEventPacket_t event_packet = {event_p->header, event_p->byte0, event_p->byte1, event_p->byte2};
-  MidiUSB.sendMIDI(event_packet);
-  MidiUSB.flush();
-}
+//void sendMIDIMessage(struct midi_event* event_p) {
+//  midiEventPacket_t event_packet = {event_p->header, event_p->byte0, event_p->byte1, event_p->byte2};
+//  MidiUSB.sendMIDI(event_packet);
+//  MidiUSB.flush();
+//}
 
 void setup() {
   create_testpattern();
   order_events();
-  serial_print_pattern(0, 0);
+  serialPrintPattern(0, 0);
   uClock.init();
   uClock.setClock96PPQNOutput(clockOut96PPQN);
   uClock.setTempo(100);

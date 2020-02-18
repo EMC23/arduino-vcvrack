@@ -16,8 +16,8 @@ extern "C" {
 #define NOTE_OFF 0x80
 #define NUM_LEDS 8
 #define MIDI_CHANNEL 0
-#define NUM_BANKS 4
-#define NUM_PATTERNS_PER_BANK 4
+#define NUM_BANKS 2
+#define NUM_PATTERNS_PER_BANK 2
 #define MAX_EVENTS_PER_PATTERN 24
 
 struct midi_event {
@@ -38,8 +38,8 @@ struct pattern patterns[NUM_BANKS][NUM_PATTERNS_PER_BANK];
 
 /**
  * Add a MIDI note on and -off to a pattern 
- * @param bank Pattern bank index.
- * @param pattern Pattern index.
+ * @param bank_index Pattern bank index.
+ * @param ptrn_index Pattern index.
  * @param time Note start time in 96PPQN.
  * @param duration Note duration in 96PPQN.
  * @param channel Note channel.
