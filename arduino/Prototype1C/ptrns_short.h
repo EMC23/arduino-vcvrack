@@ -35,8 +35,24 @@ extern "C" {
  * 
  * CC event controller: 2 bits, 4 controllers supported.
  * CC event value: 5 bits, 32 values instead of the regular 127.
+ * 
+ * 
+ * In case of 32 bits event:
+ * 8 bits, time 8 beats, 2 bars of 24 PPQN
+ * 2 bits, type Note or CC or two others
+ * 4 bits, channel 1 to 16
+ * 
+ * 8 bits, Note pitch
+ * 8 bits, Note velocity
+ * 
+ * 8 bits, CC controller
+ * 8 bits, CC value
+ * 
+ * 
+ * In case of 16 and 8, 24 bits event:
+ * 
  */
-typedef uint16_t event_t;
+typedef uint32_t event_t;
 
 typedef struct {
   event_t events[MAX_EVENTS_PER_PATTERN];
