@@ -2,7 +2,10 @@
 //#include <MIDIUSB_Defs.h>
 //#include <MIDIUSB.h>
 #include <uClock.h>
-#include "patterns.h"
+
+extern "C" {
+  #include "patterns.h"
+}
 
 #define NUM_LEDS 8
 #define PATTERN_DURATION 96
